@@ -47,6 +47,9 @@ Follow [@getcodegraph](https://x.com/getcodegraph) on X for updates.
 
 </div>
 
+> [!NOTE]
+> **About this fork** — this is a fork of [colbymchenry/codegraph](https://github.com/colbymchenry/codegraph) that ships a **Nix flake** for native Nix/NixOS installation (upstream's `curl|sh` installer doesn't work under Nix: FHS paths like `~/.local/bin` aren't on `$PATH`, and the immutable store is incompatible with imperative installers). The flake support is taken from upstream PR [#331](https://github.com/colbymchenry/codegraph/pull/331) — **all credit for it goes to [@uxtechie](https://github.com/uxtechie) (Julián Mulet)**, who authored the PR. Everything else tracks upstream `main`.
+
 ## Contents
 
 - [Get Started](#get-started)
@@ -94,6 +97,27 @@ npm i -g @colbymchenry/codegraph
 <sub>CodeGraph bundles its own runtime — nothing to compile, no native build, works the same everywhere. The installer puts `codegraph` on your PATH but **doesn't change your current shell** — open a new terminal before the next step so the command resolves.</sub>
 
 <sub>**Upgrade any time** with `codegraph upgrade` — it detects how you installed (bundle, npm, or npx) and updates in place. Add `--check` to see if an update is available, or `codegraph upgrade <version>` to pin one.</sub>
+
+</details>
+
+<details>
+<summary><b>On Nix / NixOS? Use the flake (this fork)</b></summary>
+
+```bash
+# Run directly
+nix run github:CUexter/codegraph
+
+# Install to your profile
+nix profile install github:CUexter/codegraph
+
+# Use as an input in your own flake / NixOS config
+inputs.codegraph.url = "github:CUexter/codegraph";
+
+# Development shell
+nix develop github:CUexter/codegraph
+```
+
+<sub>Supports linux and darwin on x86_64 and aarch64. The wrapper injects `--liftoff-only`, matching the official bundle launcher. Flake support is from upstream PR [#331](https://github.com/colbymchenry/codegraph/pull/331) by [@uxtechie](https://github.com/uxtechie). When `package-lock.json` changes, the `npmDepsHash` in `flake.nix` must be refreshed (`nix run nixpkgs#prefetch-npm-deps -- package-lock.json`).</sub>
 
 </details>
 

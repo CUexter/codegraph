@@ -36,10 +36,17 @@
               src = ./.;
               # Update after package-lock.json changes:
               #   nix run nixpkgs#prefetch-npm-deps -- package-lock.json
-              hash = "sha256-7cGlc4q+9DoPsyPDos5BfE9n2Qmvlvl8QEDiD/y6+e0=";
+              hash = "sha256-J8viY38M/loCoJmpxEOIApN6cpf6sU2aa80knVNRSvI=";
             };
 
             inherit nodejs;
+
+            # Allow npm's normal workspace executable lookup: the Nix npm
+            # patch otherwise picks the root's Vite 5 over the UI's Vite 7.
+            preBuild = ''
+              unset NIX_NODEJS_BUILDNPMPACKAGE
+              patchShebangs ui/node_modules
+            '';
 
             npmBuildScript = "build";
 
@@ -58,6 +65,9 @@
               # Production node_modules — prune devDependencies that the
               # build step pulled in so the closure stays lean.
               npm prune --omit=dev
+              # The private UI workspace is shipped as dist/viewer; its
+              # source-directory link would dangle in the installed package.
+              rm -f node_modules/@colbymchenry/codegraph-ui
               find node_modules -mindepth 1 -maxdepth 1 -type d -empty -delete
               cp -r node_modules $out/lib/codegraph/node_modules
 
